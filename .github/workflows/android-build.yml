@@ -28,35 +28,35 @@ jobs:
 
       - name: Ensure WizLightsOff Directory Exists
         run: |
-          if [ ! -d "WizLightsOff" ]; then
+          if [ ! -d "$GITHUB_WORKSPACE/WizLightsOff" ]; then
             echo "Directory WizLightsOff not found. Creating it..."
-            mkdir WizLightsOff
+            mkdir -p "$GITHUB_WORKSPACE/WizLightsOff"
           fi
 
       - name: Initialize Buildozer
         run: |
-          cd WizLightsOff
+          cd "$GITHUB_WORKSPACE/WizLightsOff"
           buildozer init || true
 
       - name: Set Environment Variables for Android SDK & NDK
         run: |
           echo "Setting Android SDK & NDK paths..."
-          export ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk
-          export ANDROID_NDK_HOME=$HOME/.buildozer/android/platform/android-ndk
+          export ANDROID_HOME="$GITHUB_WORKSPACE/.buildozer/android/platform/android-sdk"
+          export ANDROID_NDK_HOME="$GITHUB_WORKSPACE/.buildozer/android/platform/android-ndk"
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
 
       - name: Pre-fetch Buildozer Dependencies
         run: |
-          cd WizLightsOff
+          cd "$GITHUB_WORKSPACE/WizLightsOff"
           buildozer -v android clean
           buildozer -v android sdk install
-          buildozer -v android dependencies
+          buildozer -v android dependencies || true
 
       - name: Ensure Buildozer Directories Exist
         run: |
-          cd WizLightsOff
-          if [ ! -d ".buildozer/android/platform/python-for-android" ]; then
+          cd "$GITHUB_WORKSPACE/WizLightsOff"
+          if [ ! -d "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/python-for-android" ]; then
             echo "Buildozer directory missing, forcing download..."
             buildozer -v android clean
             buildozer -v android debug
@@ -64,7 +64,7 @@ jobs:
 
       - name: Build APK
         run: |
-          cd WizLightsOff
+          cd "$GITHUB_WORKSPACE/WizLightsOff"
           buildozer -v android debug
 
       - name: Upload APK as Artifact
