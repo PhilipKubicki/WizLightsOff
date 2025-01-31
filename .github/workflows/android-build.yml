@@ -30,14 +30,13 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE/android-sdk"
           export ANDROID_SDK_ROOT="$GITHUB_WORKSPACE/android-sdk"
-          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O cmdline-tools.zip
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
           unzip cmdline-tools.zip -d "$ANDROID_SDK_ROOT"
-          mv "$ANDROID_SDK_ROOT/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools-temp"
-          mkdir "$ANDROID_SDK_ROOT/cmdline-tools"
-          mv "$ANDROID_SDK_ROOT/cmdline-tools-temp" "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+          mv "$ANDROID_SDK_ROOT/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest"
           export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
           yes | sdkmanager --licenses
-          yes | sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0"
+          yes | sdkmanager --install "platform-tools" "build-tools;34.0.0" "platforms;android-34" "ndk;25.1.8937393"
 
       - name: Ensure WizLightsOff Directory Exists
         run: |
@@ -55,9 +54,10 @@ jobs:
         run: |
           echo "Setting Android SDK & NDK paths..."
           export ANDROID_HOME="$GITHUB_WORKSPACE/android-sdk"
-          export ANDROID_NDK_HOME="$ANDROID_HOME/ndk-bundle"
+          export ANDROID_NDK_HOME="$ANDROID_HOME/ndk/25.1.8937393"
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
+          export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/build-tools/34.0.0:$PATH"
 
       - name: Trigger Buildozer to Download Dependencies
         run: |
