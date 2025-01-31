@@ -1,0 +1,44 @@
+name: Build WizLightsOff APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip openjdk-17-jdk
+          pip install --upgrade Cython virtualenv
+          pip install buildozer pywizlight
+
+      - name: Initialize Buildozer
+        run: |
+          cd WizLightsOff
+          buildozer init || true
+
+      - name: Build APK
+        run: |
+          cd WizLightsOff
+          buildozer -v android debug
+
+      - name: Upload APK as Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: WizLightsOff-APK
+          path: WizLightsOff/bin/*.apk
+
