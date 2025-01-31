@@ -36,16 +36,14 @@ jobs:
           unzip -q cmdline-tools.zip -d "$ANDROID_SDK_ROOT"
 
           # Ensure correct directory structure
-          mv "$ANDROID_SDK_ROOT/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools-raw"
           mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
-          mv "$ANDROID_SDK_ROOT/cmdline-tools-raw"/* "$ANDROID_SDK_ROOT/cmdline-tools/latest/"
+          mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools"/* "$ANDROID_SDK_ROOT/cmdline-tools/latest/"
 
           # Ensure sdkmanager is executable
           chmod +x "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
 
           # Set PATH for sdkmanager and other tools
-          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/build-tools/34.0.0:$PATH"
-          echo "PATH=$PATH" >> $GITHUB_ENV
+          echo "export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/build-tools/34.0.0:$PATH" >> $GITHUB_ENV
 
           # Verify sdkmanager exists
           if [ ! -f "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" ]; then
@@ -72,12 +70,9 @@ jobs:
       - name: Set Environment Variables for Android SDK & NDK
         run: |
           echo "Setting Android SDK & NDK paths..."
-          export ANDROID_HOME="$GITHUB_WORKSPACE/android-sdk"
-          export ANDROID_NDK_HOME="$ANDROID_HOME/ndk/25.1.8937393"
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
-          export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/build-tools/34.0.0:$PATH"
-          echo "PATH=$PATH" >> $GITHUB_ENV
+          echo "ANDROID_HOME=$GITHUB_WORKSPACE/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=$GITHUB_WORKSPACE/android-sdk/ndk/25.1.8937393" >> $GITHUB_ENV
+          echo "export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/build-tools/34.0.0:$PATH" >> $GITHUB_ENV
 
       - name: Ensure Buildozer Directories Exist
         run: |
@@ -91,19 +86,18 @@ jobs:
             exit 1
           fi
 
+      - name: Manually Delete Old Build Directories
+        run: |
+          if [ -d "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a" ]; then
+            echo "Removing old build directory..."
+            rm -rf "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a"
+          fi
+
       - name: Trigger Buildozer to Download Dependencies
         run: |
           cd "$GITHUB_WORKSPACE/WizLightsOff"
           buildozer -v android clean
           buildozer -v android dependencies || true
-
-      - name: **Manually Delete Old Build Directories**
-        run: |
-          cd "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/"
-          if [ -d "build-arm64-v8a_armeabi-v7a" ]; then
-            echo "Removing old build directory..."
-            rm -rf build-arm64-v8a_armeabi-v7a
-          fi
 
       - name: Build APK
         run: |
