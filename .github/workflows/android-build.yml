@@ -26,36 +26,38 @@ jobs:
           pip install --upgrade Cython virtualenv setuptools wheel
           pip install --upgrade buildozer pywizlight
 
-      - name: Install Android SDK and Accept Licenses
+      - name: Install Android SDK
         run: |
           export ANDROID_SDK_ROOT="$GITHUB_WORKSPACE/android-sdk"
-          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
+          mkdir -p "$ANDROID_SDK_ROOT"
 
           # Download Android command-line tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
-          unzip -q cmdline-tools.zip -d "$ANDROID_SDK_ROOT/cmdline-tools"
+          unzip -q cmdline-tools.zip -d "$ANDROID_SDK_ROOT"
 
-          # Ensure correct folder structure
+          # Manually fix folder structure
           mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
-          if [ -d "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools" ]; then
-            mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools"/* "$ANDROID_SDK_ROOT/cmdline-tools/latest/"
-          fi
+          mv "$ANDROID_SDK_ROOT/cmdline-tools/"* "$ANDROID_SDK_ROOT/cmdline-tools/latest/" || true
 
           # Ensure sdkmanager is executable
           chmod +x "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
 
-          # Set PATH for Android SDK tools
+          # Set environment variables
           echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/25.1.8937393" >> $GITHUB_ENV
           echo "PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/build-tools/34.0.0:$PATH" >> $GITHUB_ENV
 
+      - name: Verify SDK and Install Components
+        run: |
+          export ANDROID_SDK_ROOT="$GITHUB_WORKSPACE/android-sdk"
+
           # Verify sdkmanager exists
           if [ ! -f "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" ]; then
-            echo "Error: sdkmanager not found after extraction!"
+            echo "Error: sdkmanager not found!"
             exit 1
           fi
 
-          # Accept licenses and install required SDK components
+          # Accept licenses and install required components
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --install \
               "platform-tools" \
@@ -64,8 +66,7 @@ jobs:
               "ndk;25.1.8937393"
 
       - name: Ensure WizLightsOff Directory Exists
-        run: |
-          mkdir -p "$GITHUB_WORKSPACE/WizLightsOff"
+        run: mkdir -p "$GITHUB_WORKSPACE/WizLightsOff"
 
       - name: Initialize Buildozer
         run: |
@@ -73,19 +74,14 @@ jobs:
           buildozer init || true
 
       - name: Ensure Buildozer Directories Exist
-        run: |
-          mkdir -p "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/python-for-android"
+        run: mkdir -p "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/python-for-android"
 
-      - name: Manually Delete Old Build Directories
-        run: |
-          if [ -d "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a" ]; then
-            rm -rf "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a"
-          fi
+      - name: Delete Old Build Directories
+        run: rm -rf "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a" || true
 
-      - name: Trigger Buildozer to Download Dependencies
+      - name: Run Buildozer Dependencies
         run: |
           cd "$GITHUB_WORKSPACE/WizLightsOff"
-          buildozer -v android clean
           buildozer -v android dependencies || true
 
       - name: Build APK
@@ -93,7 +89,7 @@ jobs:
           cd "$GITHUB_WORKSPACE/WizLightsOff"
           buildozer -v android debug
 
-      - name: Upload APK as Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: WizLightsOff-APK
