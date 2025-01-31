@@ -38,18 +38,20 @@ jobs:
           cd WizLightsOff
           buildozer init || true
 
-      - name: Run Buildozer to Download Dependencies
+      - name: Pre-fetch Buildozer Dependencies
         run: |
           cd WizLightsOff
-          buildozer android clean
-          buildozer -v android debug || true  # Run once to trigger downloads
+          buildozer -v android clean
+          buildozer -v android sdk install
+          buildozer -v android dependencies
 
       - name: Ensure Buildozer Directories Exist
         run: |
           cd WizLightsOff
           if [ ! -d ".buildozer/android/platform/python-for-android" ]; then
-            echo "Buildozer directory missing, re-running Buildozer to fetch dependencies..."
-            buildozer android debug
+            echo "Buildozer directory missing, forcing download..."
+            buildozer -v android clean
+            buildozer -v android debug
           fi
 
       - name: Build APK
