@@ -41,24 +41,15 @@ jobs:
       - name: Set Environment Variables for Android SDK & NDK
         run: |
           echo "Setting Android SDK & NDK paths..."
-          echo "ANDROID_HOME=$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_NDK_HOME=$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/android-ndk" >> $GITHUB_ENV
           export ANDROID_HOME="$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/android-sdk"
           export ANDROID_NDK_HOME="$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/android-ndk"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
 
-      - name: Pre-fetch Buildozer Dependencies
+      - name: Trigger Buildozer to Download Dependencies
         run: |
           cd "$GITHUB_WORKSPACE/WizLightsOff"
-          buildozer -v android clean
-          buildozer -v android dependencies || true
-
-      - name: Ensure Buildozer Directories Exist
-        run: |
-          cd "$GITHUB_WORKSPACE/WizLightsOff"
-          if [ ! -d ".buildozer/android/platform/python-for-android" ]; then
-            echo "Buildozer directory missing, forcing manual creation..."
-            mkdir -p ".buildozer/android/platform/python-for-android"
-          fi
+          buildozer -v android debug || true
 
       - name: Build APK
         run: |
