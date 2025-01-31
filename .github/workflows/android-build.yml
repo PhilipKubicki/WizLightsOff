@@ -1,6 +1,3 @@
-The job is failing because the directory /home/runner/work/WizLightsOff/WizLightsOff/WizLightsOff/.buildozer/android/platform/python-for-android is not found. The solution involves ensuring that the required directories are created before the build process. Below is the updated workflow file to address this issue:
-
-YAML
 name: Build WizLightsOff APK
 
 on:
@@ -27,7 +24,7 @@ jobs:
           sudo apt update
           sudo apt install -y python3-pip openjdk-17-jdk unzip
           pip install --upgrade Cython virtualenv setuptools wheel
-          pip install --upgrade buildozer pywizlight
+          pip install --upgrade buildozer pywizlight python-for-android
 
       - name: Ensure WizLightsOff Directory Exists
         run: |
@@ -44,22 +41,22 @@ jobs:
       - name: Set Environment Variables for Android SDK & NDK
         run: |
           echo "Setting Android SDK & NDK paths..."
-          echo "ANDROID_HOME=$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_NDK_HOME=$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/android-ndk" >> $GITHUB_ENV
-
-      - name: Pre-fetch Buildozer Dependencies
-        run: |
-          cd "$GITHUB_WORKSPACE/WizLightsOff"
-          buildozer android clean
-          buildozer -v android release || true
+          echo "ANDROID_HOME=$GITHUB_WORKSPACE/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=$GITHUB_WORKSPACE/.buildozer/android/platform/android-ndk" >> $GITHUB_ENV
+          export ANDROID_HOME="$GITHUB_WORKSPACE/.buildozer/android/platform/android-sdk"
+          export ANDROID_NDK_HOME="$GITHUB_WORKSPACE/.buildozer/android/platform/android-ndk"
 
       - name: Ensure Buildozer Directories Exist
         run: |
           cd "$GITHUB_WORKSPACE/WizLightsOff"
-          if [ ! -d ".buildozer/android/platform/python-for-android" ]; then
-            echo "Buildozer directory missing, forcing manual creation..."
-            mkdir -p ".buildozer/android/platform/python-for-android"
-          fi
+          mkdir -p .buildozer/android/platform/python-for-android
+
+      - name: Pre-fetch Buildozer Dependencies
+        run: |
+          cd "$GITHUB_WORKSPACE/WizLightsOff"
+          buildozer -v android clean
+          buildozer -v android sdk install
+          buildozer -v android dependencies || true
 
       - name: Build APK
         run: |
@@ -72,4 +69,4 @@ jobs:
           name: WizLightsOff-APK
           path: WizLightsOff/bin/*.apk
           retention-days: 7
-This workflow ensures the necessary directories are created if they do not exist, thereby preventing the FileNotFoundError during the build process.
+
