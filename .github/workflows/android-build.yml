@@ -22,9 +22,16 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3-pip openjdk-17-jdk
-          pip install --upgrade Cython virtualenv
-          pip install buildozer pywizlight
+          sudo apt install -y python3-pip openjdk-17-jdk unzip
+          pip install --upgrade Cython virtualenv setuptools wheel
+          pip install --upgrade buildozer pywizlight
+
+      - name: Ensure WizLightsOff Directory Exists
+        run: |
+          if [ ! -d "WizLightsOff" ]; then
+            echo "Directory WizLightsOff not found. Creating it..."
+            mkdir WizLightsOff
+          fi
 
       - name: Initialize Buildozer
         run: |
@@ -34,6 +41,7 @@ jobs:
       - name: Build APK
         run: |
           cd WizLightsOff
+          buildozer android clean
           buildozer -v android debug
 
       - name: Upload APK as Artifact
