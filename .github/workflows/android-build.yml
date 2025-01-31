@@ -32,7 +32,7 @@ jobs:
           export ANDROID_HOME="$ANDROID_SDK_ROOT"
           mkdir -p "$ANDROID_SDK_ROOT"
 
-          # Download Android command-line tools
+          # Download and extract Android command-line tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
           unzip -q cmdline-tools.zip -d "$ANDROID_SDK_ROOT"
           
@@ -49,7 +49,7 @@ jobs:
           echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/25.1.8937393" >> $GITHUB_ENV
           echo "PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/build-tools/34.0.0:$PATH" >> $GITHUB_ENV
 
-      - name: Verify SDK and Install Components
+      - name: Install Correct Android SDK Components
         run: |
           export ANDROID_SDK_ROOT="$GITHUB_WORKSPACE/android-sdk"
 
@@ -59,29 +59,19 @@ jobs:
             exit 1
           fi
 
-          # Accept licenses and install the **correct** build-tools version
+          # Accept licenses
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses
+
+          # Install only the required version of build-tools
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --install \
               "platform-tools" \
               "build-tools;34.0.0" \
               "platforms;android-34" \
-              "ndk;25.1.8937393" \
-              "cmdline-tools;latest" \
-              "extras;android;m2repository" \
-              "extras;google;m2repository"
+              "ndk;25.1.8937393"
 
-      - name: Install AIDL and Fix Build-Tools Path
-        run: |
-          export ANDROID_SDK_ROOT="$GITHUB_WORKSPACE/android-sdk"
-          export ANDROID_HOME="$ANDROID_SDK_ROOT"
-          yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --install "build-tools;34.0.0"
-
-          # Ensure the correct build-tools directory exists
-          mkdir -p "$ANDROID_SDK_ROOT/build-tools/34.0.0"
-
-          # Verify AIDL exists
-          if [ ! -f "$ANDROID_SDK_ROOT/build-tools/34.0.0/aidl" ]; then
-            echo "Error: AIDL is still missing after installation!"
+          # Verify build-tools installed correctly
+          if [ ! -d "$ANDROID_SDK_ROOT/build-tools/34.0.0" ]; then
+            echo "Error: build-tools 34.0.0 did not install!"
             exit 1
           fi
 
@@ -89,6 +79,10 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/android-sdk"
           ln -sfn "$ANDROID_SDK_ROOT" "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/android-sdk"
+
+      - name: Force Buildozer to Use Correct Build Tools
+        run: |
+          sed -i 's/android.build_tools_version = .*/android.build_tools_version = 34.0.0/' "$GITHUB_WORKSPACE/WizLightsOff/buildozer.spec"
 
       - name: Ensure WizLightsOff Directory Exists
         run: mkdir -p "$GITHUB_WORKSPACE/WizLightsOff"
