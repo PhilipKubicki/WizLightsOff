@@ -29,31 +29,29 @@ jobs:
       - name: Install Android SDK and Accept Licenses
         run: |
           export ANDROID_SDK_ROOT="$GITHUB_WORKSPACE/android-sdk"
-          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
+          mkdir -p "$ANDROID_SDK_ROOT"
 
           # Download and extract Android command-line tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
           unzip -q cmdline-tools.zip -d "$ANDROID_SDK_ROOT"
 
-          # Check extracted contents
-          echo "Extracted files in $ANDROID_SDK_ROOT:"
-          ls -R "$ANDROID_SDK_ROOT"
+          # Rename extracted folder to the expected structure
+          mv "$ANDROID_SDK_ROOT/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools-raw"
+          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+          mv "$ANDROID_SDK_ROOT/cmdline-tools-raw"/* "$ANDROID_SDK_ROOT/cmdline-tools/latest/"
 
-          # Ensure correct folder structure
-          mv "$ANDROID_SDK_ROOT/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest"
-
-          # Verify that sdkmanager exists
-          if [ ! -f "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" ]; then
-            echo "Error: sdkmanager not found! Extraction failed."
-            exit 1
-          fi
-
-          # Make sdkmanager executable
+          # Ensure sdkmanager is executable
           chmod +x "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
 
           # Set PATH for sdkmanager and other tools
           export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/build-tools/34.0.0:$PATH"
           echo "PATH=$PATH" >> $GITHUB_ENV
+
+          # Verify sdkmanager exists
+          if [ ! -f "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" ]; then
+            echo "sdkmanager not found! Extraction failed."
+            exit 1
+          fi
 
           # Accept licenses and install required SDK components
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses
