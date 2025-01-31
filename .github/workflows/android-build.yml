@@ -80,17 +80,24 @@ jobs:
           mkdir -p "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/android-sdk"
           ln -sfn "$ANDROID_SDK_ROOT" "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/android-sdk"
 
-      - name: Force Buildozer to Use Correct Build Tools
-        run: |
-          sed -i 's/android.build_tools_version = .*/android.build_tools_version = 34.0.0/' "$GITHUB_WORKSPACE/WizLightsOff/buildozer.spec"
-
       - name: Ensure WizLightsOff Directory Exists
         run: mkdir -p "$GITHUB_WORKSPACE/WizLightsOff"
 
       - name: Initialize Buildozer
         run: |
           cd "$GITHUB_WORKSPACE/WizLightsOff"
-          buildozer init || true
+          if [ ! -f buildozer.spec ]; then
+            buildozer init
+          fi
+
+      - name: Force Buildozer to Use Correct Build Tools
+        run: |
+          if [ -f "$GITHUB_WORKSPACE/WizLightsOff/buildozer.spec" ]; then
+            sed -i 's/android.build_tools_version = .*/android.build_tools_version = 34.0.0/' "$GITHUB_WORKSPACE/WizLightsOff/buildozer.spec"
+          else
+            echo "Error: buildozer.spec not found!"
+            exit 1
+          fi
 
       - name: Ensure Buildozer Directories Exist
         run: mkdir -p "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/python-for-android"
