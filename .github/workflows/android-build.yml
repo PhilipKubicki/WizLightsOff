@@ -59,7 +59,7 @@ jobs:
             exit 1
           fi
 
-          # Accept licenses and install all required components
+          # Accept licenses and install the **correct** build-tools version
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --install \
               "platform-tools" \
@@ -76,11 +76,19 @@ jobs:
           export ANDROID_HOME="$ANDROID_SDK_ROOT"
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --install "build-tools;34.0.0"
 
+          # Ensure the correct build-tools directory exists
+          mkdir -p "$ANDROID_SDK_ROOT/build-tools/34.0.0"
+
           # Verify AIDL exists
           if [ ! -f "$ANDROID_SDK_ROOT/build-tools/34.0.0/aidl" ]; then
             echo "Error: AIDL is still missing after installation!"
             exit 1
           fi
+
+      - name: Ensure Buildozer Uses the Correct Android SDK Path
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/android-sdk"
+          ln -sfn "$ANDROID_SDK_ROOT" "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/android-sdk"
 
       - name: Ensure WizLightsOff Directory Exists
         run: mkdir -p "$GITHUB_WORKSPACE/WizLightsOff"
