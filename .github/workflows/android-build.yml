@@ -34,8 +34,8 @@ jobs:
           # Download and extract Android command-line tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
           unzip -q cmdline-tools.zip -d "$ANDROID_SDK_ROOT"
-
-          # Rename extracted folder to the expected structure
+          
+          # Ensure correct directory structure
           mv "$ANDROID_SDK_ROOT/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools-raw"
           mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
           mv "$ANDROID_SDK_ROOT/cmdline-tools-raw"/* "$ANDROID_SDK_ROOT/cmdline-tools/latest/"
@@ -49,7 +49,7 @@ jobs:
 
           # Verify sdkmanager exists
           if [ ! -f "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" ]; then
-            echo "sdkmanager not found! Extraction failed."
+            echo "Error: sdkmanager not found after extraction!"
             exit 1
           fi
 
@@ -87,7 +87,7 @@ jobs:
       - name: Verify AIDL Installation
         run: |
           if [ ! -f "$ANDROID_HOME/build-tools/34.0.0/aidl" ]; then
-            echo "AIDL is missing. Build will fail."
+            echo "Error: AIDL is missing. Build will fail."
             exit 1
           fi
 
