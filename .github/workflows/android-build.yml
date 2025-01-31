@@ -34,7 +34,7 @@ jobs:
           # Download and extract Android command-line tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
           unzip -q cmdline-tools.zip -d "$ANDROID_SDK_ROOT"
-          
+
           # Ensure correct directory structure
           mv "$ANDROID_SDK_ROOT/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools-raw"
           mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
@@ -96,6 +96,14 @@ jobs:
           cd "$GITHUB_WORKSPACE/WizLightsOff"
           buildozer -v android clean
           buildozer -v android dependencies || true
+
+      - name: **Manually Delete Old Build Directories**
+        run: |
+          cd "$GITHUB_WORKSPACE/WizLightsOff/.buildozer/android/platform/"
+          if [ -d "build-arm64-v8a_armeabi-v7a" ]; then
+            echo "Removing old build directory..."
+            rm -rf build-arm64-v8a_armeabi-v7a
+          fi
 
       - name: Build APK
         run: |
