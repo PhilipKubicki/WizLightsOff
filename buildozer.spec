@@ -16,7 +16,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 
 # (list) Application requirements
-requirements = python3, kivy, pywizlight
+requirements = python3==3.11, kivy, pywizlight
 
 # (str) Application versioning
 version = 0.1
@@ -31,7 +31,7 @@ fullscreen = 0
 android.permissions = INTERNET
 
 # (int) Target Android API level (must be 31+ for modern devices)
-android.api = 31
+android.api = 34
 
 # (int) Minimum Android API level
 android.minapi = 23
@@ -48,7 +48,17 @@ android.archs = arm64-v8a, armeabi-v7a
 # (bool) Enable logging for debugging (set to 1 to disable)
 android.disable_logging = 0
 
-[buildozer]
+# (str) Force specific Android SDK build-tools version
+android.build_tools_version = 34.0.0
 
-# (int) Log level (0 = error only, 1 = info, 2 = debug)
-log_level = 2
+# (str) Force specific Android NDK version
+android.ndk = 25.1.8937393
+
+# (bool) Accept Android SDK license automatically
+android.accept_sdk_license = True
+
+# (str) Manually specify SDK path
+android.sdk_path = $ANDROID_SDK_ROOT
+
+# (str) Package format (apk, aab, etc.)
+android.package_format = apk
