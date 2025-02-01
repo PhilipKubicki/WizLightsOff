@@ -51,9 +51,12 @@ jobs:
           sudo mkdir -p /opt/android-sdk/build-tools/
           sudo mkdir -p /opt/android-sdk/platform-tools/
 
+          # **Fix repositories.cfg permission issue**
+          sudo mkdir -p /home/runner/.android
+          sudo touch /home/runner/.android/repositories.cfg
+          sudo chmod 777 /home/runner/.android/repositories.cfg
+
           # Accept SDK Licenses **BEFORE INSTALLING COMPONENTS**
-          sudo mkdir -p ~/.android
-          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.android/repositories.cfg
           yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
           # Install required Android SDK components
