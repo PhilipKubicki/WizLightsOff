@@ -30,6 +30,9 @@ jobs:
 
       - name: Set up Android SDK & Accept Licenses
         run: |
+          # Remove any previous Android SDK to ensure a fresh setup
+          sudo rm -rf /opt/android-sdk
+
           # Download Command Line Tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O android_cmd_tools.zip
           sudo mkdir -p /opt/android-sdk/cmdline-tools
@@ -44,17 +47,11 @@ jobs:
           # Ensure necessary directories exist
           sudo mkdir -p /opt/android-sdk/build-tools/
 
-          # Remove all previous build-tools versions
-          sudo rm -rf /opt/android-sdk/build-tools/*
-
-          # Force refresh SDK manager
-          sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --update
-
           # Install the correct Build-Tools version
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
             "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
 
-          # Ensure the build-tools directory exists before making a symlink
+          # Verify that build-tools directory exists before making a symlink
           if [ -d "/opt/android-sdk/build-tools/31.0.0" ]; then
             sudo ln -sf /opt/android-sdk/build-tools/31.0.0 /opt/android-sdk/build-tools/latest
           else
@@ -65,7 +62,7 @@ jobs:
           # Accept licenses inside the correct SDK location without "Broken pipe" errors
           yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-          # Set the correct AIDL path
+          # Ensure AIDL is in the path
           echo "PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH" >> $GITHUB_ENV
           export PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH
 
