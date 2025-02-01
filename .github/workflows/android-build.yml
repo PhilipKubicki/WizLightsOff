@@ -40,9 +40,12 @@ jobs:
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620" >> $GITHUB_ENV
+          echo "PATH=/opt/android-sdk/cmdline-tools/latest/bin:$PATH" >> $GITHUB_ENV
+          
           export ANDROID_SDK_ROOT=/opt/android-sdk
           export ANDROID_HOME=/opt/android-sdk
           export ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620
+          export PATH=/opt/android-sdk/cmdline-tools/latest/bin:$PATH
           
           sudo mkdir -p /home/runner/.android
           sudo touch /home/runner/.android/repositories.cfg
@@ -78,8 +81,6 @@ jobs:
           mkdir -p ~/.buildozer/android/platform/android-sdk/
           ln -sfn /opt/android-sdk ~/.buildozer/android/platform/android-sdk
           echo "sdk.dir=/opt/android-sdk" > ~/.buildozer/android/platform/android-sdk/local.properties
-          echo "ANDROID_HOME=/opt/android-sdk" >> ~/.bashrc
-          echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> ~/.bashrc
 
       - name: Remove Old Buildozer SDK Tools
         run: |
@@ -95,4 +96,3 @@ jobs:
         with:
           name: WizLightsOff-APK
           path: bin/*.apk
- 
