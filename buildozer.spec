@@ -2,7 +2,8 @@
 title = WizLightsOff
 package.name = wizlightsoff
 package.domain = com.example
-source.include_exts = py,png,jpg,kv,atlas
+source.dir = .
+version = 1.0.0  # Required version field
 
 # Ensure the correct Python version is used
 requirements = python3,kivy,pywizlight,libffi,pyjnius
