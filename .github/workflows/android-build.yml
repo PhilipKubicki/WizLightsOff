@@ -52,28 +52,28 @@ jobs:
           sudo touch /home/runner/.android/repositories.cfg
           sudo chmod 777 /home/runner/.android/repositories.cfg
 
-          # Accept SDK Licenses **BEFORE INSTALLING COMPONENTS**
+          # Accept SDK Licenses BEFORE INSTALLING COMPONENTS
           yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-          # **Ensure SDK Manager Uses the Correct Path**
+          # Ensure SDK Manager Uses the Correct Path
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
             "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
 
-          # **Ensure the correct build-tools are installed**
+          # Ensure the correct build-tools are installed
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install "build-tools;31.0.0"
 
           # Verify that build-tools directory exists before linking
           if [ -d "/opt/android-sdk/build-tools/31.0.0" ]; then
             sudo ln -sf /opt/android-sdk/build-tools/31.0.0 /opt/android-sdk/build-tools/latest
           else
-            echo "❌ ERROR: Build-tools directory /opt/android-sdk/build-tools/31.0.0 does not exist!"
+            echo "ERROR: Build-tools directory /opt/android-sdk/build-tools/31.0.0 does not exist!"
             ls -al /opt/android-sdk/build-tools/
             exit 1
           fi
 
-          # **Explicitly confirm AIDL exists**
+          # Explicitly confirm AIDL exists
           if [ ! -f "/opt/android-sdk/build-tools/31.0.0/aidl" ]; then
-            echo "❌ ERROR: AIDL tool is still missing after installation!"
+            echo "ERROR: AIDL tool is still missing after installation!"
             ls -al /opt/android-sdk/build-tools/31.0.0/
             exit 1
           fi
@@ -82,7 +82,7 @@ jobs:
           echo "PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH" >> $GITHUB_ENV
           export PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH
 
-      - name: **Force Buildozer to Use System-Wide Android SDK**
+      - name: Force Buildozer to Use System-Wide Android SDK
         run: |
           mkdir -p ~/.buildozer/android/platform/android-sdk/
           ln -sfn /opt/android-sdk ~/.buildozer/android/platform/android-sdk
