@@ -21,13 +21,12 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3-pip openjdk-17-jdk unzip wget
+          sudo apt install -y python3-pip openjdk-17-jdk unzip wget libffi-dev libssl-dev
 
       - name: Install Buildozer & Dependencies
         run: |
           pip install --upgrade pip
           pip install buildozer cython
-          sudo apt install -y libffi-dev libssl-dev
 
       - name: Set up Android SDK & NDK
         run: |
@@ -35,11 +34,15 @@ jobs:
           sudo mkdir -p /opt/android-sdk
           sudo unzip -q android_cmd_tools.zip -d /opt/android-sdk/cmdline-tools
           sudo mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
+          
+          # Set environment variables
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620" >> $GITHUB_ENV
+
+          # Install Android tools
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-          sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-31" "build-tools;30.0.3" "ndk;23.1.7779620"
+          sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
 
       - name: Build APK
         run: |
