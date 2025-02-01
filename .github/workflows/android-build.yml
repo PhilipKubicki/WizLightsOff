@@ -39,12 +39,16 @@ jobs:
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620" >> $GITHUB_ENV
+          
+          # Accept all licenses
+          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
-          # Install Android tools
+          # Install required SDK components
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
 
-      - name: Accept Android Licenses
-        run: yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+          # Ensure Build-Tools 31.0.0 is used instead of 36-rc4
+          sudo rm -rf /opt/android-sdk/build-tools/36*
+          echo "ANDROID_BUILD_TOOLS_VERSION=31.0.0" >> $GITHUB_ENV
 
       - name: Build APK
         run: |
