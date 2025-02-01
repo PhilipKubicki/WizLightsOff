@@ -30,8 +30,9 @@ jobs:
 
       - name: Set up Android SDK & Accept Licenses
         run: |
+          # Download Command Line Tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O android_cmd_tools.zip
-          sudo mkdir -p /opt/android-sdk
+          sudo mkdir -p /opt/android-sdk/cmdline-tools
           sudo unzip -q android_cmd_tools.zip -d /opt/android-sdk/cmdline-tools
           sudo mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
 
@@ -39,7 +40,7 @@ jobs:
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620" >> $GITHUB_ENV
-          
+
           # Remove all previous build-tools versions
           sudo rm -rf /opt/android-sdk/build-tools/*
 
@@ -49,6 +50,9 @@ jobs:
 
           # Accept licenses inside the correct SDK location
           yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+          # Force `31.0.0` as the only available build-tools version
+          sudo ln -sf /opt/android-sdk/build-tools/31.0.0 /opt/android-sdk/build-tools/latest
 
           # Set the correct AIDL path
           echo "PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH" >> $GITHUB_ENV
