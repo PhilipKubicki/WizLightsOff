@@ -28,9 +28,9 @@ jobs:
           pip install --upgrade pip
           pip install buildozer cython
 
-      - name: Set up Android SDK & Accept Licenses
+      - name: **Force AIDL & Build-Tools Fix**
         run: |
-          # Completely remove any previous Android SDK (fresh start)
+          # Completely remove previous Android SDK
           sudo rm -rf /opt/android-sdk
 
           # Download and extract Android Command Line Tools
@@ -39,7 +39,7 @@ jobs:
           sudo unzip -q android_cmd_tools.zip -d /opt/android-sdk/cmdline-tools
           sudo mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
 
-          # Set up environment variables for SDK
+          # Set up environment variables
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620" >> $GITHUB_ENV
@@ -51,22 +51,29 @@ jobs:
           sudo mkdir -p /opt/android-sdk/build-tools/
           sudo mkdir -p /opt/android-sdk/platform-tools/
 
-          # Update SDK manager
-          sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --update
-
-          # Accept licenses before installing components
+          # Accept SDK Licenses (proper method)
           yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-          # Install required Android SDK components
+          # Install **ONLY** required Android SDK components
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
             "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
 
-          # VERIFY: Ensure Build-Tools directory exists before linking
+          # **Force AIDL install**
+          sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install "build-tools;31.0.0"
+
+          # Verify that build-tools directory exists before linking
           if [ -d "/opt/android-sdk/build-tools/31.0.0" ]; then
             sudo ln -sf /opt/android-sdk/build-tools/31.0.0 /opt/android-sdk/build-tools/latest
           else
             echo "❌ ERROR: Build-tools directory /opt/android-sdk/build-tools/31.0.0 does not exist!"
             ls -al /opt/android-sdk/build-tools/
+            exit 1
+          fi
+
+          # **Explicitly confirm AIDL exists**
+          if [ ! -f "/opt/android-sdk/build-tools/31.0.0/aidl" ]; then
+            echo "❌ ERROR: AIDL tool is still missing after installation!"
+            ls -al /opt/android-sdk/build-tools/31.0.0/
             exit 1
           fi
 
