@@ -30,34 +30,38 @@ jobs:
 
       - name: Set up Android SDK & Accept Licenses
         run: |
-          # Remove any previous Android SDK to ensure a fresh setup
+          # Completely remove previous Android SDK (fresh start)
           sudo rm -rf /opt/android-sdk
 
-          # Download Command Line Tools
+          # Download and extract Android Command Line Tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O android_cmd_tools.zip
           sudo mkdir -p /opt/android-sdk/cmdline-tools
           sudo unzip -q android_cmd_tools.zip -d /opt/android-sdk/cmdline-tools
           sudo mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
 
-          # Set environment variables
+          # Set up environment variables for SDK
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620" >> $GITHUB_ENV
+          export ANDROID_SDK_ROOT=/opt/android-sdk
+          export ANDROID_HOME=/opt/android-sdk
+          export ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620
 
           # Ensure necessary directories exist
           sudo mkdir -p /opt/android-sdk/build-tools/
+          sudo mkdir -p /opt/android-sdk/platform-tools/
 
-          # Force refresh SDK manager
+          # Update SDK manager
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --update
 
-          # Accept licenses BEFORE installing components
+          # Accept licenses before installing components
           yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-          # Install the correct Build-Tools version
+          # Install required Android SDK components
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
             "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
 
-          # Verify that build-tools directory exists before making a symlink
+          # Verify build-tools directory before linking
           if [ -d "/opt/android-sdk/build-tools/31.0.0" ]; then
             sudo ln -sf /opt/android-sdk/build-tools/31.0.0 /opt/android-sdk/build-tools/latest
           else
@@ -65,7 +69,7 @@ jobs:
             exit 1
           fi
 
-          # Ensure AIDL is in the path
+          # Ensure AIDL is accessible
           echo "PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH" >> $GITHUB_ENV
           export PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH
 
