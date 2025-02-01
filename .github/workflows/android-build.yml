@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04  # Ensure stable Ubuntu version
+    runs-on: ubuntu-22.04  # Ensures stability
 
     steps:
       - name: Checkout Repository
@@ -39,9 +39,6 @@ jobs:
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620" >> $GITHUB_ENV
-          
-          # Ensure licenses are accepted
-          yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
           # REMOVE all problematic build-tools versions
           sudo rm -rf /opt/android-sdk/build-tools/*
