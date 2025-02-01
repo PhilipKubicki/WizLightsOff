@@ -33,9 +33,8 @@ jobs:
           sudo rm -rf /opt/android-sdk
           
           wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O android_cmd_tools.zip
-          sudo mkdir -p /opt/android-sdk/cmdline-tools
-          sudo unzip -q android_cmd_tools.zip -d /opt/android-sdk/cmdline-tools
-          sudo mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
+          sudo mkdir -p /opt/android-sdk/cmdline-tools/latest
+          sudo unzip -q android_cmd_tools.zip -d /opt/android-sdk/cmdline-tools/latest
           
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
@@ -75,7 +74,7 @@ jobs:
           echo "PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH" >> $GITHUB_ENV
           export PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH
 
-      - name: **Delete Buildozer’s Local SDK Folder**
+      - name: Delete Buildozer’s Local SDK Folder
         run: |
           rm -rf ~/.buildozer/android/platform/android-sdk/
           rm -rf ~/.buildozer/android/
@@ -85,7 +84,7 @@ jobs:
           echo "ANDROID_HOME=/opt/android-sdk" >> ~/.bashrc
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> ~/.bashrc
 
-      - name: **Confirm Buildozer Uses Correct SDK Path**
+      - name: Confirm Buildozer Uses Correct SDK Path
         run: |
           echo "Checking Buildozer SDK Path:"
           ls -al ~/.buildozer/android/platform/
