@@ -30,7 +30,7 @@ jobs:
 
       - name: Set up Android SDK & Accept Licenses
         run: |
-          # Completely remove previous Android SDK (fresh start)
+          # Completely remove any previous Android SDK (fresh start)
           sudo rm -rf /opt/android-sdk
 
           # Download and extract Android Command Line Tools
@@ -61,11 +61,12 @@ jobs:
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
             "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
 
-          # Verify build-tools directory before linking
+          # VERIFY: Ensure Build-Tools directory exists before linking
           if [ -d "/opt/android-sdk/build-tools/31.0.0" ]; then
             sudo ln -sf /opt/android-sdk/build-tools/31.0.0 /opt/android-sdk/build-tools/latest
           else
-            echo "ERROR: Build-tools directory /opt/android-sdk/build-tools/31.0.0 does not exist."
+            echo "❌ ERROR: Build-tools directory /opt/android-sdk/build-tools/31.0.0 does not exist!"
+            ls -al /opt/android-sdk/build-tools/
             exit 1
           fi
 
