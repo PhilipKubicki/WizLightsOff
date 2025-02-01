@@ -31,28 +31,28 @@ jobs:
       - name: Set up Android SDK & Accept Licenses
         run: |
           sudo rm -rf /opt/android-sdk
-
+          
           wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O android_cmd_tools.zip
           sudo mkdir -p /opt/android-sdk/cmdline-tools
           sudo unzip -q android_cmd_tools.zip -d /opt/android-sdk/cmdline-tools
           sudo mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
-
+          
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620" >> $GITHUB_ENV
           export ANDROID_SDK_ROOT=/opt/android-sdk
           export ANDROID_HOME=/opt/android-sdk
           export ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620
-
+          
           sudo mkdir -p /home/runner/.android
           sudo touch /home/runner/.android/repositories.cfg
           sudo chmod 777 /home/runner/.android/repositories.cfg
-
+          
           yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
-
+          
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
             "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
-
+          
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install "build-tools;31.0.0"
 
           if [ -d "/opt/android-sdk/build-tools/31.0.0" ]; then
