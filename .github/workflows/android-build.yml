@@ -20,8 +20,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          sudo apt update
-          sudo apt install -y python3-pip openjdk-17-jdk unzip wget libffi-dev libssl-dev
+          sudo -S apt update < /dev/null
+          sudo -S apt install -y python3-pip openjdk-17-jdk unzip wget libffi-dev libssl-dev < /dev/null
 
       - name: Install Buildozer & Dependencies
         run: |
@@ -30,11 +30,11 @@ jobs:
 
       - name: Set up Android SDK & Accept Licenses
         run: |
-          sudo rm -rf /opt/android-sdk
+          sudo -S rm -rf /opt/android-sdk < /dev/null
           
           wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O android_cmd_tools.zip
-          sudo mkdir -p /opt/android-sdk/cmdline-tools/latest
-          sudo unzip -q android_cmd_tools.zip -d /opt/android-sdk/cmdline-tools/latest
+          sudo -S mkdir -p /opt/android-sdk/cmdline-tools/latest < /dev/null
+          sudo -S unzip -q android_cmd_tools.zip -d /opt/android-sdk/cmdline-tools/latest < /dev/null
           
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
@@ -46,19 +46,19 @@ jobs:
           export ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620
           export PATH=/opt/android-sdk/cmdline-tools/latest/bin:$PATH
           
-          sudo mkdir -p /home/runner/.android
-          sudo touch /home/runner/.android/repositories.cfg
-          sudo chmod 777 /home/runner/.android/repositories.cfg
+          sudo -S mkdir -p /home/runner/.android < /dev/null
+          sudo -S touch /home/runner/.android/repositories.cfg < /dev/null
+          sudo -S chmod 777 /home/runner/.android/repositories.cfg < /dev/null
           
-          yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          yes | sudo -S /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses < /dev/null || true
           
-          sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
-            "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
+          sudo -S /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
+            "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620" < /dev/null
           
-          sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install "build-tools;31.0.0"
+          sudo -S /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install "build-tools;31.0.0" < /dev/null
 
           if [ -d "/opt/android-sdk/build-tools/31.0.0" ]; then
-            sudo ln -sf /opt/android-sdk/build-tools/31.0.0 /opt/android-sdk/build-tools/latest
+            sudo -S ln -sf /opt/android-sdk/build-tools/31.0.0 /opt/android-sdk/build-tools/latest < /dev/null
           else
             echo "ERROR: Build-tools directory does not exist!"
             ls -al /opt/android-sdk/build-tools/
@@ -76,8 +76,8 @@ jobs:
 
       - name: Delete Buildozer’s Local SDK Folder
         run: |
-          rm -rf ~/.buildozer/android/platform/android-sdk/
-          rm -rf ~/.buildozer/android/
+          sudo -S rm -rf ~/.buildozer/android/platform/android-sdk/ < /dev/null
+          sudo -S rm -rf ~/.buildozer/android/ < /dev/null
           mkdir -p ~/.buildozer/android/platform/
           ln -sfn /opt/android-sdk ~/.buildozer/android/platform/android-sdk
           echo "sdk.dir=/opt/android-sdk" > ~/.buildozer/android/platform/android-sdk/local.properties
