@@ -30,7 +30,7 @@ jobs:
 
       - name: Set up Android SDK & Accept Licenses
         run: |
-          # Remove any previous Android SDK installation
+          # Remove any previous Android SDK
           sudo rm -rf /opt/android-sdk
 
           # Download and extract the latest Android Command Line Tools
@@ -82,7 +82,7 @@ jobs:
           echo "PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH" >> $GITHUB_ENV
           export PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH
 
-      - name: **Force Buildozer to Use Correct SDK Path**
+      - name: Force Buildozer to Use Correct SDK Path
         run: |
           mkdir -p ~/.buildozer/android/platform/android-sdk/
           ln -sfn /opt/android-sdk ~/.buildozer/android/platform/android-sdk
