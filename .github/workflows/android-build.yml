@@ -47,6 +47,12 @@ jobs:
           # Ensure necessary directories exist
           sudo mkdir -p /opt/android-sdk/build-tools/
 
+          # Force refresh SDK manager
+          sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --update
+
+          # Accept licenses BEFORE installing components
+          yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
           # Install the correct Build-Tools version
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
             "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
@@ -58,9 +64,6 @@ jobs:
             echo "ERROR: Build-tools directory /opt/android-sdk/build-tools/31.0.0 does not exist."
             exit 1
           fi
-
-          # Accept licenses inside the correct SDK location without "Broken pipe" errors
-          yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
           # Ensure AIDL is in the path
           echo "PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH" >> $GITHUB_ENV
