@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04  # Ensures stability
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout Repository
@@ -46,6 +46,9 @@ jobs:
 
           # Remove all previous build-tools versions
           sudo rm -rf /opt/android-sdk/build-tools/*
+
+          # Force refresh SDK manager
+          sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --update
 
           # Install the correct Build-Tools version
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
