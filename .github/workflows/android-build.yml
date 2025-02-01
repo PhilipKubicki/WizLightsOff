@@ -28,7 +28,7 @@ jobs:
           pip install --upgrade pip
           pip install buildozer cython
 
-      - name: **Force AIDL & Build-Tools Fix**
+      - name: Force AIDL & Build-Tools Fix
         run: |
           # Completely remove previous Android SDK
           sudo rm -rf /opt/android-sdk
