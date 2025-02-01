@@ -21,7 +21,7 @@ android.orientation = portrait
 android.allow_ndk = True
 
 # (str) Package format to build for (one of: "armeabi-v7a", "arm64-v8a", "x86", "x86_64", or "all")
-android.arch = arm64-v8a
+android.archs = arm64-v8a
 
 [buildozer]
 log_level = 2
