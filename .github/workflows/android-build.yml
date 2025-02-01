@@ -95,4 +95,3 @@ jobs:
         with:
           name: WizLightsOff-APK
           path: bin/*.apk
-
