@@ -24,3 +24,4 @@ android.ndk_path = $ANDROID_NDK_HOME
 android.aidl = True
 android.build_tools_version = 31.0.0
 android.accept_sdk_license = True
+android.arch = arm64-v8a  # Ensure proper architecture
