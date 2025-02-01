@@ -5,9 +5,6 @@ package.domain = com.example
 source.dir = .
 version = 1.0.0
 
-# (str) The entry point for your application.
-source.include_exts = py,png,jpg,kv,atlas
-
 # (list) Application requirements
 requirements = python3,kivy,pywizlight,libffi,pyjnius
 
@@ -46,34 +43,3 @@ android.build_tools_version = 31.0.0
 
 # (bool) Automatically accept SDK licenses
 android.accept_sdk_license = True
-
-# (list) Enable specific features
-android.ndk = 23b
-android.ndk_path = $ANDROID_NDK_HOME
-android.ndk_api = 21
-
-# (bool) Enable OpenGL ES 2
-android.opengles = True
-
-# (str) The Java class name for your main application
-android.entrypoint = org.kivy.android.PythonActivity
-
-# (list) Gradle dependencies
-android.gradle_dependencies = com.android.support:support-v4:+
-
-# (bool) Enable MultiDex for apps with multiple libraries
-android.multidex = True
-
-# (str) Additional libraries to include in APK
-android.add_libs_armeabi-v7a = False
-android.add_libs_arm64-v8a = False
-android.add_libs_x86 = False
-
-# (bool) Enable debugging
-android.debug = False
-
-# (bool) Allow building APK in debug mode
-android.allow_debug = True
-
-# (bool) Force Buildozer to use a single thread for build
-android.singlethread = True

@@ -42,8 +42,8 @@ jobs:
           
           # Remove all previous build-tools versions
           sudo rm -rf /opt/android-sdk/build-tools/*
-          
-          # Force install the correct Build-Tools version
+
+          # Install the correct Build-Tools version
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
             "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
 
