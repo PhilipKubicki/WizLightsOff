@@ -75,18 +75,24 @@ jobs:
           echo "PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH" >> $GITHUB_ENV
           export PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH
 
-      - name: Force Buildozer to Use System-Wide Android SDK
+      - name: **Delete Buildozer’s Local SDK Folder**
         run: |
           rm -rf ~/.buildozer/android/platform/android-sdk/
-          mkdir -p ~/.buildozer/android/platform/android-sdk/
+          rm -rf ~/.buildozer/android/
+          mkdir -p ~/.buildozer/android/platform/
           ln -sfn /opt/android-sdk ~/.buildozer/android/platform/android-sdk
           echo "sdk.dir=/opt/android-sdk" > ~/.buildozer/android/platform/android-sdk/local.properties
+          echo "ANDROID_HOME=/opt/android-sdk" >> ~/.bashrc
+          echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> ~/.bashrc
 
-      - name: Remove Old Buildozer SDK Tools
+      - name: **Confirm Buildozer Uses Correct SDK Path**
         run: |
-          if [ -d "~/.buildozer/android/platform/android-sdk/tools/" ]; then
-            rm -rf ~/.buildozer/android/platform/android-sdk/tools/
-          fi
+          echo "Checking Buildozer SDK Path:"
+          ls -al ~/.buildozer/android/platform/
+          ls -al ~/.buildozer/android/platform/android-sdk/
+          echo "SDK Manager Location:"
+          which sdkmanager
+          /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --version
 
       - name: Build APK
         run: buildozer android debug
@@ -96,3 +102,4 @@ jobs:
         with:
           name: WizLightsOff-APK
           path: bin/*.apk
+
