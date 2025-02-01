@@ -30,16 +30,13 @@ jobs:
 
       - name: Set up Android SDK & Accept Licenses
         run: |
-          # Remove any previous Android SDK installation
           sudo rm -rf /opt/android-sdk
 
-          # Download and extract the latest Android Command Line Tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O android_cmd_tools.zip
           sudo mkdir -p /opt/android-sdk/cmdline-tools
           sudo unzip -q android_cmd_tools.zip -d /opt/android-sdk/cmdline-tools
           sudo mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
 
-          # Set up environment variables
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620" >> $GITHUB_ENV
@@ -47,15 +44,12 @@ jobs:
           export ANDROID_HOME=/opt/android-sdk
           export ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620
 
-          # Fix repositories.cfg permission issue
           sudo mkdir -p /home/runner/.android
           sudo touch /home/runner/.android/repositories.cfg
           sudo chmod 777 /home/runner/.android/repositories.cfg
 
-          # Accept SDK Licenses BEFORE INSTALLING COMPONENTS
           yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-          # Ensure SDK Manager Uses the Correct Path
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
             "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
 
@@ -78,7 +72,7 @@ jobs:
           echo "PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH" >> $GITHUB_ENV
           export PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH
 
-      - name: **Remove Buildozer’s Incorrect SDK Folder**
+      - name: Force Buildozer to Use System-Wide Android SDK
         run: |
           rm -rf ~/.buildozer/android/platform/android-sdk/
           mkdir -p ~/.buildozer/android/platform/android-sdk/
@@ -87,7 +81,7 @@ jobs:
           echo "ANDROID_HOME=/opt/android-sdk" >> ~/.bashrc
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> ~/.bashrc
 
-      - name: **Delete Old Buildozer SDK Tools Folder**
+      - name: Remove Old Buildozer SDK Tools
         run: |
           if [ -d "~/.buildozer/android/platform/android-sdk/tools/" ]; then
             rm -rf ~/.buildozer/android/platform/android-sdk/tools/
