@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04  # Use 22.04 for better compatibility
+    runs-on: ubuntu-22.04  # Use a stable Ubuntu version
 
     steps:
       - name: Checkout Repository
@@ -28,27 +28,28 @@ jobs:
           pip install --upgrade pip
           pip install buildozer cython
 
-      - name: Set up Android SDK & NDK
+      - name: Install Android SDK & Accept Licenses
         run: |
           wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O android_cmd_tools.zip
           sudo mkdir -p /opt/android-sdk
           sudo unzip -q android_cmd_tools.zip -d /opt/android-sdk/cmdline-tools
           sudo mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
-          
+
           # Set environment variables
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620" >> $GITHUB_ENV
+          
+          # Ensure licenses are accepted
+          yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
-          # Install only the required SDK components
+          # Remove existing build-tools and install the correct version
+          sudo rm -rf /opt/android-sdk/build-tools/*
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
             "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
 
-      - name: Accept All Android SDK Licenses
-        run: yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-
-      - name: Remove Problematic Build-Tools 36-rc4
-        run: sudo rm -rf /opt/android-sdk/build-tools/36*
+          # Ensure the correct build-tools directory exists
+          sudo ln -s /opt/android-sdk/build-tools/31.0.0 /opt/android-sdk/build-tools/latest
 
       - name: Build APK
         run: |
