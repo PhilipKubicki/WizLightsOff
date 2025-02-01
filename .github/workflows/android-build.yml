@@ -39,16 +39,20 @@ jobs:
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=/opt/android-sdk/ndk/23.1.7779620" >> $GITHUB_ENV
-
-          # REMOVE all problematic build-tools versions
+          
+          # Remove all previous build-tools versions
           sudo rm -rf /opt/android-sdk/build-tools/*
           
           # Force install the correct Build-Tools version
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
             "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
 
-          # Manually set AIDL path to fix "AIDL not found" error
+          # Accept licenses inside the correct SDK location
+          yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+          # Set the correct AIDL path
           echo "PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH" >> $GITHUB_ENV
+          export PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH
 
       - name: Build APK
         run: |
