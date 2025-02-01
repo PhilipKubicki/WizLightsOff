@@ -30,7 +30,7 @@ jobs:
 
       - name: Set up Android SDK & Accept Licenses
         run: |
-          # Remove any existing Android SDK installation
+          # Remove any previous Android SDK to ensure a fresh start
           sudo rm -rf /opt/android-sdk
 
           # Download and extract the latest Android Command Line Tools
@@ -59,7 +59,10 @@ jobs:
           sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install \
             "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
 
-          # Ensure AIDL & Build Tools Exist
+          # **Ensure the correct build-tools are installed**
+          sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install "build-tools;31.0.0"
+
+          # Verify that build-tools directory exists before linking
           if [ -d "/opt/android-sdk/build-tools/31.0.0" ]; then
             sudo ln -sf /opt/android-sdk/build-tools/31.0.0 /opt/android-sdk/build-tools/latest
           else
@@ -68,16 +71,21 @@ jobs:
             exit 1
           fi
 
-          # Confirm AIDL exists
+          # **Explicitly confirm AIDL exists**
           if [ ! -f "/opt/android-sdk/build-tools/31.0.0/aidl" ]; then
             echo "❌ ERROR: AIDL tool is still missing after installation!"
             ls -al /opt/android-sdk/build-tools/31.0.0/
             exit 1
           fi
 
-          # Ensure AIDL is in PATH
+          # Ensure AIDL is accessible
           echo "PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH" >> $GITHUB_ENV
           export PATH=/opt/android-sdk/build-tools/31.0.0/:$PATH
+
+      - name: **Force Buildozer to Use Correct SDK Path**
+        run: |
+          mkdir -p ~/.buildozer/android/platform/android-sdk/
+          ln -sfn /opt/android-sdk ~/.buildozer/android/platform/android-sdk
 
       - name: Build APK
         run: |
